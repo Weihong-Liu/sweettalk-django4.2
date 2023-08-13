@@ -75,10 +75,31 @@ from rest_framework.views import APIView
 from .serializer import *
 
 class GetGoods(APIView):
-    def get(self,request):
-        queryset = Goods.objects.all()
-        serializer = GoodsSerializer(instance=queryset,many = True)
+    def get(self, request):
+        data = Goods.objects.all()
+        serializer = GoodsSerializer(instance=data, many=True)
         print(serializer.data)
+        return Response(serializer.data)
+
+    def post(self, request):
+        # 从请求数据中提取字段
+        request_data = {
+            "category": request.data.get("Goodscategory"),
+            "number": request.data.get("number"),
+            "name": request.data.get("name"),
+            "barcode": request.data.get("barcode"),
+            "spec": request.data.get("spec"),
+            "shelf_life_days": request.data.get("shelf_life_days"),
+            "purchase_price": request.data.get("purchase_price"),
+            "retail_price": request.data.get("retail_price"),
+            "remark": request.data.get("remark"),
+        }
+
+        # 使用 create() 方法创建新的商品对象
+        new_goods = Goods.objects.create(**request_data)
+
+        # 对创建的对象进行序列化，并作为响应返回
+        serializer = GoodsSerializer(instance=new_goods)
         return Response(serializer.data)
 ```
 
@@ -126,8 +147,3 @@ urlpatterns = [
   # 输出：
   [OrderedDict([('id', 1), ('number', '1'), ('name', '第一个产品'), ('purchase_price', 100.0), ('retail_price', 150.0), ('remark', '测试产品')]), OrderedDict([('id', 2), ('number', '123'), ('name', '产品2'), ('purchase_price', 123.0), ('retail_price', 4123.0), ('remark', '测试产品2')])]  
   ```
-
-* 序列化关联对象（有外键字段）
-
-  ‍
-* ‍
